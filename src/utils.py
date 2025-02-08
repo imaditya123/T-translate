@@ -1,6 +1,6 @@
 import torch
 from tqdm import tqdm
-
+import matplotlib.pyplot as plt
 
 def save_model(model, optimizer, epoch, file_path):
     """
@@ -91,3 +91,94 @@ def translate(model, src_sentence, src_tokenizer, tgt_tokenizer, device, max_len
 
     translated_sentence = tgt_tokenizer.decode(tgt_tokens)
     return translated_sentence
+
+def evaluate(model, data_loader, criterion, device, pad_token_id):
+    """
+    Evaluates the model on the provided data_loader and plots batch loss and accuracy.
+    
+    Args:
+        model (torch.nn.Module): The trained model.
+        data_loader (DataLoader): DataLoader for the evaluation dataset.
+        criterion (torch.nn.Module): Loss function (e.g., nn.CrossEntropyLoss).
+        device (torch.device): Device to perform computation on.
+        pad_token_id (int): The token ID used for padding, which should be ignored in accuracy.
+    
+    Returns:
+        avg_loss (float): Average loss over the dataset.
+        avg_accuracy (float): Overall token-level accuracy (excluding pad tokens).
+    """
+    model.eval()  # set model to evaluation mode
+    total_loss = 0.0
+    total_correct = 0
+    total_tokens = 0
+    
+    # Lists to store batch-wise metrics for plotting
+    batch_losses = []
+    batch_accuracies = []
+    
+    # Disable gradient computation for evaluation
+    with torch.no_grad():
+        for src, tgt in data_loader:
+            src, tgt = src.to(device), tgt.to(device)
+            
+            # For teacher forcing: 
+            #   * The decoder input is all tokens except the last one.
+            #   * The target for loss computation is all tokens except the first one.
+            decoder_input = tgt[:, :-1]   # shape: [batch, seq_len - 1]
+            target_output = tgt[:, 1:]      # shape: [batch, seq_len - 1]
+            
+            # Forward pass: model output shape -> [batch, seq_len - 1, vocab_size]
+            output = model(src, decoder_input)
+            
+            # Flatten the output and target for loss computation:
+            output_flat = output.contiguous().view(-1, output.size(-1))
+            target_flat = target_output.contiguous().view(-1)
+            
+            loss = criterion(output_flat, target_flat)
+            total_loss += loss.item()
+            batch_losses.append(loss.item())
+            
+            # Compute predictions (taking the token with highest logit)
+            preds = output.argmax(dim=-1)  # shape: [batch, seq_len - 1]
+            
+            # Create a mask to ignore padded tokens in the target.
+            # Assume pad_token_id is set appropriately.
+            mask = target_output != pad_token_id
+            
+            # Count correct predictions where the mask is True.
+            correct = (preds == target_output) & mask
+            correct_count = correct.sum().item()
+            tokens_count = mask.sum().item()
+            
+            batch_accuracy = correct_count / tokens_count if tokens_count > 0 else 0
+            batch_accuracies.append(batch_accuracy)
+            
+            total_correct += correct_count
+            total_tokens += tokens_count
+
+    avg_loss = total_loss / len(data_loader)
+    avg_accuracy = total_correct / total_tokens if total_tokens > 0 else 0
+
+    # Plot the batch losses and accuracies
+    plt.figure(figsize=(12, 5))
+    
+    # Plot Loss per batch
+    plt.subplot(1, 2, 1)
+    plt.plot(batch_losses, marker='o', label="Loss")
+    plt.xlabel("Batch Number")
+    plt.ylabel("Loss")
+    plt.title("Batch Losses")
+    plt.legend()
+    
+    # Plot Accuracy per batch
+    plt.subplot(1, 2, 2)
+    plt.plot(batch_accuracies, marker='o', color='green', label="Accuracy")
+    plt.xlabel("Batch Number")
+    plt.ylabel("Accuracy")
+    plt.title("Batch Accuracy")
+    plt.legend()
+    
+    plt.tight_layout()
+    plt.show()
+    
+    return avg_loss, avg_accuracy

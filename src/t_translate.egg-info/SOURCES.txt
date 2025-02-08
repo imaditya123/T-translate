@@ -1,0 +1,8 @@
+LICENSE
+README.md
+setup.py
+src/t_translate.egg-info/PKG-INFO
+src/t_translate.egg-info/SOURCES.txt
+src/t_translate.egg-info/dependency_links.txt
+src/t_translate.egg-info/top_level.txt
+tests/test.py
