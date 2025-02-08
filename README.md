@@ -1,4 +1,4 @@
-# T-Translate: Transformer Model from Scratch \U0001F9E0⚡
+# T-Translate: Transformer Model from Scratch ⚡
 
 T-Translate is a **Transformer-based text generation model** built **from scratch** using PyTorch. It follows the original **Attention Is All You Need** paper, implementing a **custom Transformer architecture** for text-to-text tasks such as machine translation or text completion.
 
@@ -7,7 +7,7 @@ T-Translate is a **Transformer-based text generation model** built **from scratc
 ## **✨ Features**  
 ✅ Custom-built Transformer model (Encoder-Decoder) from scratch  
 ✅ Uses PyTorch for efficient training and inference  
-✅ Supports text-to-text tasks like translation or summarization  
+✅ Supports text-to-text tasks like translation
 ✅ Configurable hyperparameters via `config.py`  
 ✅ Includes training, evaluation, and inference scripts  
 
@@ -37,7 +37,7 @@ T-Translate/
 
 ### **1️⃣ Clone the Repository**  
 ```bash
-git clone https://github.com/your-username/T-Translate.git
+git clone https://github.com/imaditya123/T-translate.git
 cd T-Translate
 ```
 
@@ -73,7 +73,6 @@ EPOCHS = 10             # Number of training epochs
 ---
 
 ## **🚀 Future Enhancements**  
-🔹 Implement positional encodings  
 🔹 Add support for sequence classification tasks  
 🔹 Optimize for large-scale datasets  
 🔹 Deploy as an API  
@@ -86,3 +85,10 @@ EPOCHS = 10             # Number of training epochs
 
 📢 **Contributions & feedback are welcome!** Open an issue or create a pull request. 🚀
 
+---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/imaditya123/T-translate?tab=MIT-1-ov-file) file for details.
+
+---
