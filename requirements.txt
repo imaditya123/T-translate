@@ -1,0 +1,6 @@
+torch
+tqdm
+pandas
+pyarrow
+fastparquet
+huggingface-hub
